@@ -40,6 +40,19 @@ public synchronized void decrease(Long id, Long quantity) {
 
 </br>
 
+(궁금증)
+@Transactional을 어느정도 레벨로 거는게 맞나??? (method? class?)
+<img width="456" alt="image" src="https://user-images.githubusercontent.com/45115557/229291389-c4ecc852-c906-4529-8c7c-8f7f20fd5879.png">
+차이점이 뭔지
+
 ## 2. Database 이용
 
-1. Optimi
+1. PassimisticLock(비관적 lock)
+
+### 장점
+
+* 충돌이 자주 발생하는 서비스의 경우 optimistic lock 보다 성능이 좋을 수 있음
+
+### 단점
+
+* 별도의 lock을 
