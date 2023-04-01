@@ -23,7 +23,7 @@ transaction 의 begin ~ end 사이에 다른 transaction에서 요청하면 **�
 
 </br>
 
-## 1. Application Level - Synchronized
+# 1. Application Level - Synchronized
 
 ```java
 
@@ -43,9 +43,9 @@ public synchronized void decrease(Long id, Long quantity) {
 (궁금증)
 @Transactional을 어느정도 레벨로 거는게 맞나??? (method? class?)   
 
-</br>
+</br></br>
 
-## 2. Database 이용
+# 2. Database 이용
 
 적용에 앞서 shared lock과 exclusive 의 차이점을 다시 복습해보자. 
 
@@ -56,9 +56,9 @@ public synchronized void decrease(Long id, Long quantity) {
 출처: https://www.geeksforgeeks.org/difference-between-shared-lock-and-exclusive-lock/
 
 
-</br>
+</br></br>
 
-1. PassimisticLock(비관적 lock)
+## PassimisticLock(비관적 lock)
 
 실제로 데이터에 Lock을 걸어서 정합성을 맞추는 방법으로, execlusive lock을 걸게 되면 다른 트랜젝션에서는 lock이 해제되기 전에 데이터를 가져갈 수 없음
 
@@ -127,6 +127,70 @@ public class PessimisticLockStockService {
 
 select for update가 잘 실행되는 것을 알 수 있고, 정상적으로 재고가 감소하게 된다. 
 
+</br></br>
+
+
+## Optimistic lock(낙관적)
+
+실제로 Lock을 이용하지 않고 버전을 이용함으로써 정합성을 맞추는 방법.    
+먼저 데이터를 읽은 후에 update를 수행할 때 현재 내가 읽은 버전에 맞는지 확인하여 업데이트하며, 수정사항이 있을때 (버전이 다를 때) 다시 읽은 후 작업을 수행함.
+
+### 장점
+
+* 충돌이 많지 않은 경우엔 pessimistic보다 빠름
+
+### 단점
+
+* 버전이 맞지 않을 때 재시도 로직을 개발자가 구현해주어야 함
+* 충돌이 많을 경우 느림
+
+```java
+
+public interface StockRepository extends JpaRepository<Stock,Long> {
+
+    @Lock(value = LockModeType.OPTIMISTIC)
+    @Query("select s from Stock s where s.id=:id")
+    Stock findByIdOptimisticLock(Long id);
+}
+
+```
+
+optimisticlock 코드를 레포지토리에 추가해준다.
+
+```java
+
+@Service
+public class PessimisticLockStockService {
+
+    private StockRepository stockRepository;
+
+    public PessimisticLockStockService(StockRepository stockRepository) {
+        this.stockRepository = stockRepository;
+    }
+
+    @Transactional //lock 걸때 @Transactional 없으면 에러남
+    public void decrease(Long id, Long quantity) {
+        Stock stock = stockRepository.findByIdWithPessimisticLock(id);
+
+        stock.decrease(quantity);
+
+        stockRepository.saveAndFlush(stock);
+    }
+}
+
+
+```
+
+<img width="1284" alt="스크린샷 2023-04-01 오후 11 19 27" src="https://user-images.githubusercontent.com/45115557/229296360-02859132-c7a3-4e06-83d2-b77a7d31d41d.png">
+
+
+테스트를 돌려보면, 버전을 조회하는걸 확인할 수 있다. 
+
+
+
+</br></br>
+
+## Named lock
 
 
 
