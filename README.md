@@ -227,7 +227,7 @@ public class OptimisticLockStockFacade {
 
 ### 장점
 
-* 분산환경에서 사용할 수 있다.
+* 분산환경에서 사용할 수 있다. (즉 스케일 아웃된 DB 환경에서 사용 가능)
 * timeout으로 인한 lock 해지 구현이 쉽다.
 
 ### 단점
