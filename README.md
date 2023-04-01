@@ -160,17 +160,17 @@ optimisticlock 코드를 레포지토리에 추가해준다.
 ```java
 
 @Service
-public class PessimisticLockStockService {
+public class OptimisticLockStockService {
 
     private StockRepository stockRepository;
 
-    public PessimisticLockStockService(StockRepository stockRepository) {
+    public OptimisticLockStockService(StockRepository stockRepository) {
         this.stockRepository = stockRepository;
     }
 
     @Transactional //lock 걸때 @Transactional 없으면 에러남
     public void decrease(Long id, Long quantity) {
-        Stock stock = stockRepository.findByIdWithPessimisticLock(id);
+        Stock stock = stockRepository.findByIdOptimisticLock(id);
 
         stock.decrease(quantity);
 
