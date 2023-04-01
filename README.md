@@ -236,7 +236,7 @@ public class OptimisticLockStockFacade {
 * 커넥션을 잡아먹기 때문에 상용에서는 별도의 데이터소스를 사용해야 한다.
 
 
-우선 별도의 lockRepository를 구현한다. 
+NativeQuery를 사용하기 위해 별도의 lockRepository를 구현한다. 
 
 ```java
 
@@ -312,7 +312,7 @@ public class NamedLockStockFacade {
 
 <img width="1187" alt="image" src="https://user-images.githubusercontent.com/45115557/229296886-6e3a1859-a074-49b0-97d1-5b57a3f7e809.png">
  
- 테스트를 돌려보면 
+ 테스트를 돌려보면 lock을 획득하고 업데이트하고 해제하는걸 볼 수 있다. 
 
 
 </br>
