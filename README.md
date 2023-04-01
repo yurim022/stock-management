@@ -236,7 +236,83 @@ public class OptimisticLockStockFacade {
 * 커넥션을 잡아먹기 때문에 상용에서는 별도의 데이터소스를 사용해야 한다.
 
 
+우선 별도의 lockRepository를 구현한다. 
 
+```java
+
+public interface LockRepository extends JpaRepository<Stock,Long> {
+    //실무에서는 별도의 jdbc를 사용하는 등 datasource 새로 정의해서 사용하기 (connection 부족할 수 있음)
+    //named lock은 분산 lock 구현할때 주로 사용. pessimistic에 비해 timed out 을 사용하기 좋음
+    //transactional 종료 시 세션관리와 lock 해제를 잘 해주어야 하므로 주의해야 함
+    //실제 사용시 구현이 복잡할 수 있음
+
+    @Query(value = "select get_lock(:key, 3000)",nativeQuery = true)
+    void getLock(String key);
+
+    @Query(value = "select release_lock(:key)",nativeQuery = true)
+    void releaseLock(String key);
+}
+
+
+```
+
+NamedLock을 사용할 때에는 @Transactional에서 Propagation.REQUIRES_NEW 를 해주어야 한다. 
+
+```java
+
+@Service
+public class StockService {
+
+    private StockRepository stockRepository;
+
+    public StockService(StockRepository stockRepository) {
+        this.stockRepository = stockRepository;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW) // for named lock
+    public synchronized void decrease(Long id, Long quantity) {
+        Stock stock = stockRepository.findById(id).orElseThrow();
+        stock.decrease(quantity);
+        stockRepository.saveAndFlush(stock);
+    }
+}
+
+```
+
+lock을 getLock 하고 release 하는 코드를 작성한다. 
+
+```java
+
+@Component
+public class NamedLockStockFacade {
+
+    private final LockRepository lockRepository;
+
+    private final StockService stockService;
+
+    public NamedLockStockFacade(LockRepository lockRepository, StockService stockService) {
+        this.lockRepository = lockRepository;
+        this.stockService = stockService;
+    }
+
+    @Transactional
+    public void decrease(Long id, Long quantity) {
+
+        try {
+            lockRepository.getLock(id.toString());
+            stockService.decrease(id,quantity);
+        } finally {
+            lockRepository.releaseLock(id.toString());
+        }
+    }
+
+}
+
+```
+
+<img width="1187" alt="image" src="https://user-images.githubusercontent.com/45115557/229296886-6e3a1859-a074-49b0-97d1-5b57a3f7e809.png">
+ 
+ 테스트를 돌려보면 
 
 
 </br>
