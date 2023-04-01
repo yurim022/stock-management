@@ -41,13 +41,17 @@ public synchronized void decrease(Long id, Long quantity) {
 </br>
 
 (궁금증)
-@Transactional을 어느정도 레벨로 거는게 맞나??? (method? class?)
+@Transactional을 어느정도 레벨로 거는게 맞나??? (method? class?)   
 <img width="456" alt="image" src="https://user-images.githubusercontent.com/45115557/229291389-c4ecc852-c906-4529-8c7c-8f7f20fd5879.png">
 차이점이 뭔지
+
+</br>
 
 ## 2. Database 이용
 
 1. PassimisticLock(비관적 lock)
+
+실제로 데이터에 Lock을 걸어서 정합성을 맞추는 방법으로, execlusive lock을 걸게 되면 다른 트랜젝션에서는 lock이 해제되기 전에 데이터를 가져갈 수 없음
 
 ### 장점
 
@@ -55,4 +59,52 @@ public synchronized void decrease(Long id, Long quantity) {
 
 ### 단점
 
-* 별도의 lock을 
+* 별도의 lock을 걸기 때문에 성능 감소가 있을 수 있음
+* deadlock 이 걸릴 수 있기 때문에 조심해서 사용하여야 함 
+
+</br>
+
+**StockRespository**
+
+```java
+
+public interface StockRepository extends JpaRepository<Stock,Long> {
+
+    @Lock(value = LockModeType.PESSIMISTIC_WRITE)
+    @Query("select s from Stock s where s.id=:id")
+    Stock findByIdWithPessimisticLock(Long id);
+}
+```
+
+</br>
+
+**PessimisticLockStockService**
+
+```java
+
+@Service
+public class PessimisticLockStockService {
+
+    private StockRepository stockRepository;
+
+    public PessimisticLockStockService(StockRepository stockRepository) {
+        this.stockRepository = stockRepository;
+    }
+
+    @Transactional
+    public void decrease(Long id, Long quantity) {
+        Stock stock = stockRepository.findByIdWithPessimisticLock(id);
+
+        stock.decrease(quantity);
+
+        stockRepository.saveAndFlush(stock);
+    }
+}
+
+```
+
+여기에서 주의할 점은 @Transactional을 꼭 붙여줘야 한다는 것인데, 비관적 lock을 걸면 select for update를 하게 되는데 @Transactional이 없으면 오류가 발생한다. 
+
+<img width="1268" alt="image" src="https://user-images.githubusercontent.com/45115557/229291736-66a50293-8827-4f1f-88d6-71088af89257.png">
+
+select for update가 잘 실행되는 것을 알 수 있고, 정상적으로 재고가 감소하게 된다. 
