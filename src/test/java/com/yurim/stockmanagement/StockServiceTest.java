@@ -66,5 +66,7 @@ public class StockServiceTest {
 
         assertEquals(0L,stock.getQuantity());
         //해당 테스트 fail. 수량이 감소되기 전 데이터를 읽었기 때문!!
+        // 함수 앞에 @Transactional + synchronized 붙여도 fail -> commit 되기 이전의 값을 read 할 수 있음
+        // @Transactional 을 제거하고 synchronized 만 하면 성공
     }
 }
