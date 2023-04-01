@@ -64,9 +64,9 @@ public synchronized void decrease(Long id, Long quantity) {
 
 
 ### Lock Modes
-* PASSIMISTIC_READ : shared lock(s-lock) 으로 update, delete 가 불가능하다.
-* PESSIMISTIC_WRITE : exclusive lock(x-lock) 으로 lock을 획득하지 못한 트랜잭션이 read,update,delete 를 할 수 없다.
-* PESSIMISTIC_FORCE_INCREMENT: PESSIMISTIC_WRITE와 동일하게 동작하며 추가로 엔티티 버전을 업데이트 한다. 
+* `PASSIMISTIC_READ` : shared lock(s-lock) 으로 update, delete 가 불가능하다.
+* `PESSIMISTIC_WRITE` : exclusive lock(x-lock) 으로 lock을 획득하지 못한 트랜잭션이 read,update,delete 를 할 수 없다.
+* `PESSIMISTIC_FORCE_INCREMENT`: `PESSIMISTIC_WRITE`와 동일하게 동작하며 추가로 엔티티 버전을 업데이트 한다. 
    
 
 ### 장점
