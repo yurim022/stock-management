@@ -105,6 +105,7 @@ public class PessimisticLockStockService {
 
 여기에서 주의할 점은 @Transactional을 꼭 붙여줘야 한다는 것인데, 비관적 lock을 걸면 select for update를 하게 되는데 @Transactional이 없으면 오류가 발생한다. 
 
-<img width="1268" alt="image" src="https://user-images.githubusercontent.com/45115557/229291736-66a50293-8827-4f1f-88d6-71088af89257.png">
+<img width="1263" alt="image" src="https://user-images.githubusercontent.com/45115557/229291786-02bdb9d4-b572-4ab3-a8b5-484eb0c46902.png">
+
 
 select for update가 잘 실행되는 것을 알 수 있고, 정상적으로 재고가 감소하게 된다. 
