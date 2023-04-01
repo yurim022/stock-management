@@ -63,7 +63,7 @@ public synchronized void decrease(Long id, Long quantity) {
 실제로 데이터에 Lock을 걸어서 정합성을 맞추는 방법으로, execlusive lock을 걸게 되면 다른 트랜젝션에서는 lock이 해제되기 전에 데이터를 가져갈 수 없음
 
 
-#### Lock Modes
+### Lock Modes
 * PASSIMISTIC_READ : shared lock(s-lock) 으로 update, delete 가 불가능하다.
 * PESSIMISTIC_WRITE : exclusive lock(x-lock) 으로 lock을 획득하지 못한 트랜잭션이 read,update,delete 를 할 수 없다.
 * PESSIMISTIC_FORCE_INCREMENT: PESSIMISTIC_WRITE와 동일하게 동작하며 추가로 엔티티 버전을 업데이트 한다. 
