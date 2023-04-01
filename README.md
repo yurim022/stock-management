@@ -23,7 +23,7 @@ transaction 의 begin ~ end 사이에 다른 transaction에서 요청하면 **�
 
 </br>
 
-## 1. Synchronized
+## 1. Application Level - Synchronized
 
 ```java
 
@@ -56,6 +56,7 @@ public synchronized void decrease(Long id, Long quantity) {
 ### 장점
 
 * 충돌이 자주 발생하는 서비스의 경우 optimistic lock 보다 성능이 좋을 수 있음
+* 강력한 데이터 정합성을 보장함
 
 ### 단점
 
@@ -103,7 +104,7 @@ public class PessimisticLockStockService {
 
 ```
 
-여기에서 주의할 점은 @Transactional을 꼭 붙여줘야 한다는 것인데, 비관적 lock을 걸면 select for update를 하게 되는데 @Transactional이 없으면 오류가 발생한다. 
+여기에서 주의할 점은 @Transactional을 꼭 붙여줘야 한다는 것인데, 비관적 lock을 걸면 select for update를 하는데 @Transactional이 없으면 의미가 없어서인지...오류가 발생한다. (이유 아는사람은 가르쳐주세요...) 
 
 <img width="1263" alt="image" src="https://user-images.githubusercontent.com/45115557/229291786-02bdb9d4-b572-4ab3-a8b5-484eb0c46902.png">
 
