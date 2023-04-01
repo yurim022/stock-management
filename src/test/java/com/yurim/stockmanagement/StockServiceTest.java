@@ -1,6 +1,7 @@
 package com.yurim.stockmanagement;
 
 import com.yurim.stockmanagement.domain.Stock;
+import com.yurim.stockmanagement.repository.StockRepository;
 import com.yurim.stockmanagement.service.StockService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +22,7 @@ public class StockServiceTest {
     private StockService stockService;
 
     @Autowired
-    private  StockRepository stockRepository;
+    private StockRepository stockRepository;
 
     @BeforeEach
     public void before(){

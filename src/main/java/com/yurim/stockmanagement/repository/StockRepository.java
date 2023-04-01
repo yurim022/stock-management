@@ -1,4 +1,4 @@
-package com.yurim.stockmanagement;
+package com.yurim.stockmanagement.repository;
 
 import com.yurim.stockmanagement.domain.Stock;
 import org.springframework.data.jpa.repository.JpaRepository;
