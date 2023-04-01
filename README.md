@@ -181,6 +181,37 @@ public class OptimisticLockStockService {
 
 ```
 
+update 시 버전이 맞지 않을  재시도 하는 로직을 구현해준다.
+
+
+```java
+
+@Service
+public class OptimisticLockStockFacade {
+
+    private OptimisticLockStockService optimisticLockStockService;
+
+    public OptimisticLockStockFacade(OptimisticLockStockService optimisticLockStockService) {
+        this.optimisticLockStockService = optimisticLockStockService;
+    }
+
+    public void decrease(Long id, Long quantity) throws InterruptedException {
+
+        //실패시 재요청 할 수 있도록 함
+        while (true) {
+            try {
+                optimisticLockStockService.decrease(id, quantity);
+
+                break;
+            } catch (Exception e) {
+                Thread.sleep(50);
+            }
+        }
+    }
+}
+
+```
+
 <img width="1284" alt="스크린샷 2023-04-01 오후 11 19 27" src="https://user-images.githubusercontent.com/45115557/229296360-02859132-c7a3-4e06-83d2-b77a7d31d41d.png">
 
 
@@ -190,7 +221,21 @@ public class OptimisticLockStockService {
 
 </br></br>
 
-## Named lock
+## Named lock 
+
+이름을 가진 metadata lock이다. 이름을 가진 lock을 획득한 후 해제할때까지 다른 세션은 이 lock을 획득할 수 없다. 
+
+### 장점
+
+* 분산환경에서 사용할 수 있다.
+* timeout으로 인한 lock 해지 구현이 쉽다.
+
+### 단점
+
+* 트랜젝션이 종료될 때 lock이 자동으로 해제되지 않기 때문에 별도의 명령어로 해제를 수행하거나 선점시간이 끝나야 해제된다.
+* 커넥션을 잡아먹기 때문에 상용에서는 별도의 데이터소스를 사용해야 한다.
+
+
 
 
 
