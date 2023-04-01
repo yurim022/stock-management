@@ -2,6 +2,7 @@ package com.yurim.stockmanagement;
 
 import com.yurim.stockmanagement.domain.Stock;
 import com.yurim.stockmanagement.repository.StockRepository;
+import com.yurim.stockmanagement.service.PessimisticLockStockService;
 import com.yurim.stockmanagement.service.StockService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,8 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 public class StockServiceTest {
 
+//    private StockService stockService;
     @Autowired
-    private StockService stockService;
+    private PessimisticLockStockService stockService;
 
     @Autowired
     private StockRepository stockRepository;
@@ -65,8 +67,11 @@ public class StockServiceTest {
         Stock stock = stockRepository.findById(1L).orElseThrow();
 
         assertEquals(0L,stock.getQuantity());
-        //해당 테스트 fail. 수량이 감소되기 전 데이터를 읽었기 때문!!
+        // 1. synchronized 사용
         // 함수 앞에 @Transactional + synchronized 붙여도 fail -> commit 되기 이전의 값을 read 할 수 있음
         // @Transactional 을 제거하고 synchronized 만 하면 성공
+        // 하지만 synchronized 는 하나의 프로세스 안에서만 보장됨. 서버가 1대일때는 괜찮지만 서버가 2대 이상일때는 데이터 접근을 여러대에서 할 수 있어서 race condition 발생 가능
+
+
     }
 }
