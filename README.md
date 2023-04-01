@@ -49,6 +49,17 @@ public synchronized void decrease(Long id, Long quantity) {
 
 ## 2. Database 이용
 
+적용에 앞서 shared lock과 exclusive 의 차이점을 다시 복습해보자. 
+
+![image](https://user-images.githubusercontent.com/45115557/229293553-7507a796-2d62-437f-9b98-7686cea52fba.png)
+
+![image](https://user-images.githubusercontent.com/45115557/229293599-b7030f83-05a1-441d-b6f2-8596bfbbb469.png)
+
+출처: https://www.geeksforgeeks.org/difference-between-shared-lock-and-exclusive-lock/
+
+
+</br>
+
 1. PassimisticLock(비관적 lock)
 
 실제로 데이터에 Lock을 걸어서 정합성을 맞추는 방법으로, execlusive lock을 걸게 되면 다른 트랜젝션에서는 lock이 해제되기 전에 데이터를 가져갈 수 없음
@@ -110,3 +121,12 @@ public class PessimisticLockStockService {
 
 
 select for update가 잘 실행되는 것을 알 수 있고, 정상적으로 재고가 감소하게 된다. 
+
+
+
+
+</br>
+
+참고링크: https://www.baeldung.com/jpa-pessimistic-locking
+
+
