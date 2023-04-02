@@ -318,10 +318,18 @@ public class NamedLockStockFacade {
 
 # 3. Redis
 
-## Redission
+## Lettuce
 
 NamdedLock과 비슷하게 동작하며, setnx를 통해 키가 없으면 세팅하고 없으면 접근할 수 없다. spinlock 방식으로 키를 획득할때까지 재시도 로직을 개발자가 구현해주어야 한다.   
 NamedLock과 다른 점은 세션관리를 해줄 필요가 없다는 것이다.   
+
+### 장점
+
+* 구현이 쉬움
+
+### 단점
+
+* spinlock을 사용하기 때문에 서버에 부하를 줄 수 있다. 때문에 재시도 전 Thread.sleep을 활용하여 재시도 시점을 관리
 
 
 </br>
