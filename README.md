@@ -321,18 +321,135 @@ public class NamedLockStockFacade {
 ## Lettuce
 
 NamdedLock과 비슷하게 동작하며, setnx를 통해 키가 없으면 세팅하고 없으면 접근할 수 없다. spinlock 방식으로 키를 획득할때까지 재시도 로직을 개발자가 구현해주어야 한다.   
-NamedLock과 다른 점은 세션관리를 해줄 필요가 없다는 것이다.   
 
 ### 장점
 
 * 구현이 쉬움
+* 세션관리를 하지 않아도 됨
 
 ### 단점
 
 * spinlock을 사용하기 때문에 서버에 부하를 줄 수 있다. 때문에 재시도 전 Thread.sleep을 활용하여 재시도 시점을 관리
+* 키를 획득할때까지 재시도 로직을 개발자가 구현해주어야 함
+
+```java
+
+@Component
+public class RedisLockRepository {
+
+    private RedisTemplate<String,String> redisTemplate;
+
+    public RedisLockRepository(RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+
+    public Boolean lock(Long key) {
+        return redisTemplate.opsForValue()
+                .setIfAbsent(generateKey(key),"lock", Duration.ofMillis(3_000));
+    }
+
+    public Boolean unlock(Long key) {
+        return redisTemplate.delete(generateKey(key));
+    }
+
+    private String generateKey(Long key) {
+        return key.toString();
+    }
+
+}
+
+```
 
 
-</br>
+```java
+
+@Component
+public class LettuceLockStockFacade {
+
+    private RedisLockRepository redisLockRepository;
+
+    private StockService stockService;
+
+    public LettuceLockStockFacade(RedisLockRepository redisLockRepository, StockService stockService) {
+        this.redisLockRepository = redisLockRepository;
+        this.stockService = stockService;
+    }
+
+    public void decrease(Long key, Long quantity) throws InterruptedException {
+        while (!redisLockRepository.lock(key)){
+            Thread.sleep(1100);
+        }
+
+        try {
+            stockService.decrease(key,quantity);
+        } finally {
+            redisLockRepository.unlock(key);
+        }
+    }
+}
+
+```
+
+</br></br>
+
+## Redission
+
+pub-sub 방식으로 lock 획득이 완료되면 알려주는 방식이다. spinlock과 달리 계속 요청하지 않아도 되므로 서버에 부하가 적다.   
+테스트 시 Redission이 더 빨랐다.
+
+### 장점
+
+* pub sub 구조로 서버 부하가 적음
+
+### 단점
+
+* 별도의 라이브러리를 추가해주어야 함
+
+
+redission은 별도의 repository를 생성해줄 필요가 없다. 라이브러리에서 지원해줌.
+
+
+```java
+@Component
+public class RedissonLockStockFacade {
+
+    private RedissonClient redissonClient; //별도 repository 생성x
+    private StockService stockService;
+
+    public RedissonLockStockFacade(RedissonClient redissonClient, StockService stockService) {
+        this.redissonClient = redissonClient;
+        this.stockService = stockService;
+    }
+
+    public void decrease(Long key, Long quantity) {
+        RLock lock = redissonClient.getLock(key.toString());
+        
+        try {
+            boolean available = lock.tryLock(5, 1, TimeUnit.SECONDS); //5초 기다리고 1초 점유
+
+            if (!available) {
+                System.out.println("lock 획득 실패"); //실제환경에선 log로!
+                return;
+            }
+
+            stockService.decrease(key,quantity);
+
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+
+```
+
+
+
+
+
+
+</br></br>
 
 참고링크:    
 https://www.baeldung.com/jpa-pessimistic-locking   
