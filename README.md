@@ -449,6 +449,19 @@ public class RedissonLockStockFacade {
 
 **재시도가 필요하지 않은 lock은 lettuce, 재시도가 필요한 경우 redission을 활용하는 것이 좋다.**
 
+</br></br>
+
+## Mysql(DB) vs Redis
+
+### Mysql
+
+* 어느정도 트래픽까지는 문제없이 활용이 가능
+* Redis보다 성능이 좋지 않음
+
+### Redis
+
+* 활용중인 redis가 없다면 별도의 구축비용과 관리비용 발생
+* 성능이 더 좋음
 
 
 </br></br>
