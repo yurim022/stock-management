@@ -330,7 +330,7 @@ NamdedLock과 비슷하게 동작하며, setnx를 통해 키가 없으면 세팅
 
 ### 단점
 
-* spinlock을 사용하기 때문에 lock 획득 대기 상태라면 redis에 . 때문에 재시도 전 Thread.sleep을 활용하여 재시도 시점을 관리
+* spinlock을 사용하기 때문에 lock 획득 대기 상태라면 redis에 부하. 때문에 재시도 전 Thread.sleep을 활용하여 재시도 시점을 관리
 * 키를 획득할때까지 재시도 로직을 개발자가 구현해주어야 함
 
 ```java
