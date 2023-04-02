@@ -45,7 +45,7 @@ public synchronized void decrease(Long id, Long quantity) {
 
 </br></br>
 
-# 2. Database 이용
+# 2. Database
 
 적용에 앞서 shared lock과 exclusive 의 차이점을 다시 복습해보자. 
 
@@ -316,7 +316,7 @@ public class NamedLockStockFacade {
 
 </br></br>
 
-# Redis 사용
+# 3. Redis
 
 ## Redission
 
