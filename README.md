@@ -395,7 +395,7 @@ public class LettuceLockStockFacade {
 
 ## Redission
 
-pub-sub 방식으로 lock 획득이 완료되면 알려주는 방식이다. spinlock과 달리 계속 요청하지 않아도 되므로 서버에 부하가 적다.   
+pub-sub 방식으로 lock 획득이 완료되면 알려주는 방식이다. spinlock과 달리 계속 요청하지 않아도 되므로 redis에 부하가 적다.   
 테스트 시 Redission이 더 빨랐다.
 
 ### 장점
@@ -447,8 +447,7 @@ public class RedissonLockStockFacade {
 
 ```
 
-
-
+**재시도가 필요하지 않은 lock은 lettuce, 재시도가 필요한 경우 redission을 활용하는 것이 좋다.**
 
 
 
