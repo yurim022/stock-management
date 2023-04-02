@@ -18,7 +18,6 @@ public class OptimisticLockStockFacade {
         while (true) {
             try {
                 optimisticLockStockService.decrease(id, quantity);
-
                 break;
             } catch (Exception e) {
                 Thread.sleep(50);
